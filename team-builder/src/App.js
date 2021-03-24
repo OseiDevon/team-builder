@@ -1,37 +1,63 @@
-import logo from './logo.svg';
-import './App.css';
-import React, {useState} from 'react'
-import Form from './Form'
+import React, { useState, useEffect } from "react";
+import SoandSo from "./components/SoandSo";
+import SoandSoForm from "./components/SoandSoForm";
+import axios from "./axios";
 
-const tmList = [
-  { name: "name1", email: "email1", role: "role1" },
-  { name: "name2", email: "email2", role: "role2" },
-  { name: "name3", email: "email3", role: "role3" },
-];
+const initialFormValues = {
+	username: "",
+	email: "",
+	role: "",
+};
 
-function App() {
-  const [teamMembers, setTeamMembers] = useState(tmList);
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <h1>TEAM BUILDER APP</h1>
-        <Form members={teamMembers} setMembers={setTeamMembers}/>
-        {console.log(teamMembers)}
-      </header>
-    </div>
-  );
+export default function App() {
+	const [person, setPerson] = useState([]);
+
+
+	const [formValues, setFormValues] = useState(initialFormValues);
+
+	const updateForm = (inputName, inputValue) => {
+
+		setFormValues({ ...formValues, [inputName]: inputValue });
+	};
+
+	const submitForm = () => {
+		const newSoandSo = {
+			username: formValues.username.trim(),
+			email: formValues.email.trim(),
+			role: formValues.role,
+		};
+
+		if (!newSoandSo.username || !newSoandSo.email || !newSoandSo.role) {
+			return;
+		}
+		axios
+			.post("fakeapi.com", newSoandSo)
+			.then((res) => {
+				setSoandSo([newSoandSo, ...person]);
+				setFormValues(initialFormValues);
+			})
+			.catch((err) => {
+				debugger;
+			});
+	};
+
+	useEffect(() => {
+		axios.get("fakeapi.com").then((res) => setSoandSo(res.data));
+	}, []);
+
+	return (
+		<div className="container">
+			<h1>Form App</h1>
+
+			<SoandSoForm
+				values={formValues}
+				update={updateForm}
+				submit={submitForm}
+			/>
+
+			{SoandSo.map((SoandSo) => {
+				return <SoandSo key={SoandSo.id} details={SoandSo} />;
+			})}
+		</div>
+	);
 }
-
-export default App;
